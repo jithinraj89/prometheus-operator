@@ -1,0 +1,28 @@
+#jinja2:variable_start_string:'[%', variable_end_string:'%]', trim_blocks: False
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev05-alert-rules
+  labels:
+    role: prometheus-rulefiles
+    prometheus: k8s
+data:
+  dev05.rules.yaml: |+
+    groups:
+    - name: dev05.rules
+      rules:
+      - alert: Celery Exceptions checking
+        expr: celery_exceptions{job="ferm-celery-worker",namespace="dev05"} > 5
+        for: 4h
+        labels:
+          severity: warning
+        annotations:
+          description: '{{$labels.job}}' in '{{$labels.namespace}}' exceeded the limit
+
+      - alert: example_app checking
+        expr: example_app check exception
+        for: 4h
+        labels:
+          severity: critical
+        annotations:
+          description: '{{$labels.job}}' in '{{$labels.namespace}}' example

@@ -1,0 +1,22 @@
+---
+- name: Update repo
+  include: update.yml
+  tags: [ update ]
+
+- name: Deploy Prometheus
+  include: deploy.yml
+
+- name: update alerts
+  include: apply_update.yml
+  tags: [ update ]
+
+- name: applying alerts
+  include: alert-rules.yml
+  tags: [ alert ]
+
+- name: Clean up deployment folder after deployment
+  file:
+    path: "./tmp/prometheus"
+    state: absent
+  tags: [ alert, update ]
+

@@ -1,0 +1,13 @@
+---
+deploy_env: prod
+environment_type: prod
+base_domain: basedomain.net
+
+grafana:
+  url: "grafana-monitoring.{{ base_domain }}"
+prometheus_alert:
+  url: "prometheus-alert.{{ base_domain }}"
+prometheus_server:
+  url: "prometheus-monitoring.{{ base_domain }}"
+
+

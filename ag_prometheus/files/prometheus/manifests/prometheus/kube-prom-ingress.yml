@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: internal
+  name: kube-prom-ingress
+spec:
+  tls:
+  - hosts:
+    - grafana-monitoring.base_domain.com
+    - prometheus-alert.base_domain.com
+    - prometheus-monitoring.base_domain.com
+    secretName: prometheus-tls
+  rules:
+  - host: prometheus-monitoring.base_domain.com
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-k8s
+          servicePort: 9090
+        path: /
+  - host: prometheus-alert.base_domain.com
+    http:
+      paths:
+      - backend:
+          serviceName: alertmanager-main
+          servicePort: 9093
+        path: /
+  - host: grafana-monitoring.base_domain.com
+    http:
+      paths:
+      - backend:
+          serviceName: grafana
+          servicePort: 3000
+        path: /

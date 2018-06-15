@@ -1,0 +1,25 @@
+---
+deploy_env: dev
+environment_type: non_prod
+base_domain: k8s.base_domain.com
+
+grafana:
+  url: "grafana-monitoring.{{ base_domain }}"
+prometheus_alert:
+  url: "prometheus-alert.{{ base_domain }}"
+prometheus_server:
+  url: "prometheus-monitoring.{{ base_domain }}"
+
+prom_deploy:
+  namespace: monitoring
+  path: /tmp/prometheus/manifests
+
+
+servicemonitor:
+  namespace: dev05 					        ## namespace of the monitoring application
+  name: ferm-celery-worker                  ## name of the monitoring application
+  label: ferm-celery-worker         		## label for the monitoring application 
+  matchlabel: ferm-celery-worker    		## label of the service of monitoring application
+  port_name: ferm-celery-worker   			## port name on the service of monitoring application
+
+

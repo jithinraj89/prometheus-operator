@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: internal
+  name: kube-prom-ingress
+spec:
+  tls:
+  - hosts:
+    - {{ grafana.url }}
+    - {{ prometheus_alert.url }}
+    - {{ prometheus_server.url }}
+    secretName: prometheus-tls
+  rules:
+  - host: {{ prometheus_server.url }}
+    http:
+      paths:
+      - backend:
+          serviceName: prometheus-k8s
+          servicePort: 9090
+        path: /
+  - host: {{ prometheus_alert.url }}
+    http:
+      paths:
+      - backend:
+          serviceName: alertmanager-main
+          servicePort: 9093
+        path: /
+  - host: {{ grafana.url }}
+    http:
+      paths:
+      - backend:
+          serviceName: grafana
+          servicePort: 3000
+        path: /

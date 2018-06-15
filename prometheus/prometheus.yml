@@ -1,0 +1,9 @@
+---
+- name: Playbook Prometheus
+  hosts: kubernetes
+  connection: local
+  vars_files:
+   - "password_vars/{{ deploy_env }}"
+
+  roles:
+    - ag_prometheus

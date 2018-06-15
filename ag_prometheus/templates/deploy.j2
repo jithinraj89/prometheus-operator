@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# CAUTION - setting NAMESPACE will deploy most components to the given namespace
+# however some are hardcoded to 'monitoring'. Only use if you have reviewed all manifests.
+
+kctl() {
+    kubectl --namespace "{{ prom_deploy.namespace }}" "$@"
+}
+
+kctl create secret tls prometheus-tls --key /tmp/prometheus/manifests/tls.key  --cert /tmp/prometheus/manifests/tls.crt
+
+kctl apply -f /tmp/prometheus/manifests/prometheus-operator
+
+# Wait for CRDs to be ready.
+printf "Waiting for Operator to register custom resource definitions..."
+until kctl get customresourcedefinitions servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get customresourcedefinitions prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get customresourcedefinitions alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get servicemonitors.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get prometheuses.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+until kctl get alertmanagers.monitoring.coreos.com > /dev/null 2>&1; do sleep 1; printf "."; done
+echo "done!"
+
+kctl apply -f /tmp/prometheus/manifests/node-exporter
+kctl apply -f /tmp/prometheus/manifests/kube-state-metrics
+kctl apply -f /tmp/prometheus/manifests/grafana/grafana-credentials.yaml
+kctl apply -f /tmp/prometheus/manifests/grafana
+find /tmp/prometheus/manifests/prometheus -type f ! -name prometheus-k8s-roles.yaml ! -name prometheus-k8s-role-bindings.yaml -exec kubectl --namespace "$NAMESPACE" apply -f {} \;
+kubectl apply -f /tmp/prometheus/manifests/prometheus/prometheus-k8s-roles.yaml
+kubectl apply -f /tmp/prometheus/manifests/prometheus/prometheus-k8s-role-bindings.yaml
+kctl apply -f /tmp/prometheus/manifests/alertmanager/
+kubectl apply -f /tmp/prometheus/manifests/k8s/self-hosted/

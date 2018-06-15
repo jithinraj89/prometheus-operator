@@ -1,0 +1,10 @@
+---
+
+- name: update ingress
+  command: kubectl apply -f {{ prom_deploy.path }}/prometheus/kube-prom-ingress.yml -n {{ prom_deploy.namespace }}
+
+- name: update alert manager
+  command: kubectl apply -f {{ prom_deploy.path }}/alertmanager/alertmanager-config.yml -n {{ prom_deploy.namespace }}
+
+- name: update alert rules
+  command: kubectl apply -f {{ prom_deploy.path }}/prometheus/prometheus-k8s-rules.yml  -n {{ prom_deploy.namespace }}

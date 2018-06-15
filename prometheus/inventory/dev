@@ -1,0 +1,5 @@
+[dev:children]
+kubernetes
+
+[kubernetes]
+k8s.subdomain.com ansible_ssh_host=k8s.subdomain.com

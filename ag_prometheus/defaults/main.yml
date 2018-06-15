@@ -1,0 +1,20 @@
+---
+prom_deploy:
+  namespace: monitoring
+  path: /tmp/prometheus/manifests
+
+grafana:
+  url: grafana-url
+prometheus_alert:
+  url: prometheus_alert-url
+prometheus_server:
+  url: prometheus-url
+
+servicemonitor:
+  name: ""
+  label: ""
+  matchlabel: ""
+  deploy_env: ""
+  port_name: ""
+
+prometheus_alert: false

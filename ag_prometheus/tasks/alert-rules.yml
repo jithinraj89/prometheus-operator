@@ -1,0 +1,14 @@
+---
+- name: copy service-monitor
+  template: src=service-monitor.j2 dest={{ prom_deploy.path }}/service-monitors/service-monitor-{{ servicemonitor.name }}.yml
+
+- name: update service-monitor
+  command: kubectl apply -f {{ prom_deploy.path }}/service-monitors/service-monitor-{{ servicemonitor.name }}.yml -n {{ prom_deploy.namespace }}
+
+- name: copy custom alert rules
+  template: src=rules.{{ deploy_env }}.j2 dest={{ prom_deploy.path }}/prometheus/prometheus-k8s-{{ deploy_env }}-rules.yml 
+  when: prometheus_alert == true
+
+- name: update custom alert rules
+  command: kubectl apply -f {{ prom_deploy.path }}/prometheus/prometheus-k8s-{{ deploy_env }}-rules.yml -n {{ prom_deploy.namespace }}
+  when: prometheus_alert == true

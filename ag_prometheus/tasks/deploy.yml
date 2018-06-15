@@ -1,0 +1,6 @@
+---
+- name: Deploying Prometheus (This may take a while)
+  local_action: script "{{ prom_deploy.path }}/deploy.sh"
+  register: out
+
+- debug: var=out.stdout_lines

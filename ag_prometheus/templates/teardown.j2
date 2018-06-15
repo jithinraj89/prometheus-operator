@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# CAUTION - NAMESPACE must match its value when deploy script was run.
+# Some resources are always deployed to the monitoring namespace. 
+
+kctl() {
+    kubectl --namespace "{{ prom_deploy.namespace }}" "$@"
+}
+
+kctl delete -f /tmp/prometheus/manifests/node-exporter
+kctl delete -f /tmp/prometheus/manifests/kube-state-metrics
+kctl delete -f /tmp/prometheus/manifests/grafana
+find /tmp/prometheus/manifests/prometheus -type f ! -name prometheus-k8s-roles.yaml ! -name prometheus-k8s-role-bindings.yaml -exec kubectl --namespace "$NAMESPACE" delete -f {} \;
+kubectl delete -f /tmp/prometheus/manifests/prometheus/prometheus-k8s-roles.yaml
+kubectl delete -f /tmp/prometheus/manifests/prometheus/prometheus-k8s-role-bindings.yaml
+kctl delete -f /tmp/prometheus/manifests/alertmanager
+
+# Hack: wait a bit to let the controller delete the deployed Prometheus server.
+sleep 5
+
+kctl delete -f /tmp/prometheus/manifests/prometheus-operator
+kctl delete namespace $NAMESPACE
